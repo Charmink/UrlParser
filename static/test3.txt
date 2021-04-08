@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+<head> <!-- Техническая информация о документе -->
+<meta charset="UTF-8"> <!-- Определяем кодировку символов документа -->
+<link rel="stylesheet" type="text/css" href="http://qwer/"> <!-- Подключаем внешнюю таблицу стилей -->
+<script src=""></script> <!-- Подключаем сценарии -->
+lsdklvfbj
+erab
+sdf b
+f ad
