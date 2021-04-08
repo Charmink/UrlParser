@@ -27,11 +27,11 @@ func has_url(line string) bool{ // This function find urls in string and if urls
 
 func is_valid_protocol(url string) bool{ // This function check protocol in url, if url contains "https" or "http"
 	// returns true else returns false
-	matched_http, err := regexp.MatchString(`http://`, url)
+	matched_http, err := regexp.MatchString(`"http://`, url)
 	if err != nil{
 		panic(err)
 	}
-	matched_https, err := regexp.MatchString(`https://`, url)
+	matched_https, err := regexp.MatchString(`"https://`, url)
 	if err != nil{
 		panic(err)
 	}
