@@ -7,12 +7,12 @@ import (
 	"regexp"
 )
 
-type Info struct {
+type Info struct {  // Struct of error in url
 	Num_of_line int
 	Num_of_column int
 	Description string
 }
-func has_url(line string) bool{
+func has_url(line string) bool{ // This function find urls in string and if urls are detected reterns true else returns false
 	matched_href, err := regexp.MatchString(`href="[^"]*"`, string(line))
 	if err != nil{
 		panic(err)
@@ -25,7 +25,8 @@ func has_url(line string) bool{
 
 }
 
-func is_valid_protocol(url string) bool{
+func is_valid_protocol(url string) bool{ // This function check protocol in url, if url contains "https" or "http"
+	// returns true else returns false
 	matched_http, err := regexp.MatchString(`http://`, url)
 	if err != nil{
 		panic(err)
@@ -37,15 +38,15 @@ func is_valid_protocol(url string) bool{
 	return matched_http || matched_https;
 }
 
-func too_many_double_slashes(url string) bool{
-	douple_slashes_tmp := regexp.MustCompile(`//`)
-	if len(douple_slashes_tmp.FindAllStringIndex(url, -1)) > 1{
+func too_many_double_slashes(url string) bool{ // This function check how much "//" contains the url
+	double_slashes_tmp := regexp.MustCompile(`//`)
+	if len(double_slashes_tmp.FindAllStringIndex(url, -1)) > 1{
 		return true
 	}
 	return false
 }
 
-func has_invalid_symbols(url string) bool{
+func has_invalid_symbols(url string) bool{ // This function find invalid symbols in the url
 	matched_inv_symbols, err := regexp.MatchString(`[^A-Z|a-z|/|"|=|:|\.]`, url)
 	if err != nil{
 		panic(err)
@@ -56,7 +57,7 @@ func has_invalid_symbols(url string) bool{
 	return false
 }
 
-func parse_line(line string, idx_line int, errs *[]Info){
+func parse_line(line string, idx_line int, errs *[]Info){ // Here the string is parsed
 	href_url_template := regexp.MustCompile(`href="[^"]*"`)
 	src_url_template := regexp.MustCompile(`src="[^"]*"`)
 	idx_coloumn_href := href_url_template.FindAllStringIndex(line, -1)
@@ -82,7 +83,7 @@ func parse_line(line string, idx_line int, errs *[]Info){
 	}
 }
 
-func Html_check(filename string) (error, []Info){
+func Html_check(filename string) (error, []Info){ // Main function that iterates strings in the gotten file
 	file, err := os.OpenFile(filename, 'r', 0600)
 	if err != nil{
 		return err, []Info{}
