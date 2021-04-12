@@ -27,7 +27,7 @@ func TestHtml_check(t *testing.T){
 		},
 	}
 	for _, test := range TestTable{
-		if _, res := html_check.Html_check(test.filename); !reflect.DeepEqual(res, test.result){
+		if _, res := html_check.HtmlCheck(test.filename); !reflect.DeepEqual(res, test.result){
 			t.Errorf("Expected: %v\nFound: %v", test.result, res)
 		}
 	}

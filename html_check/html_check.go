@@ -2,102 +2,95 @@ package html_check
 
 import (
 	"bufio"
+	//"fmt"
 	"io"
 	"os"
 	"regexp"
 )
 
-type Info struct {  // Struct of error in url
-	Num_of_line int
-	Num_of_column int
+type Info struct {  // Структура, которая хранит данные о некорректных url
+	NumOfLine int
+	NumOfColumn int
 	Description string
 }
-func has_url(line string) bool{ // This function find urls in string and if urls are detected reterns true else returns false
-	matched_href, err := regexp.MatchString(`href="[^"]*"`, string(line))
-	if err != nil{
-		panic(err)
-	}
-	matched_src, err := regexp.MatchString(`src="[^"]*"`, string(line))
-	if err != nil{
-		panic(err)
-	}
-	return matched_href || matched_src;
+func hasUrl(line string) (bool, error){ // Функция осуществляет проверку содержится ли в строке тег href или src
+	matchedHref, err := regexp.MatchString(`href="[^"]*"`, string(line))
+	matchedSrc, err := regexp.MatchString(`src="[^"]*"`, string(line))
+	return matchedHref || matchedSrc, err;
 
 }
 
-func is_valid_protocol(url string) bool{ // This function check protocol in url, if url contains "https" or "http"
-	// returns true else returns false
-	matched_http, err := regexp.MatchString(`"http://`, url)
-	if err != nil{
-		panic(err)
-	}
-	matched_https, err := regexp.MatchString(`"https://`, url)
-	if err != nil{
-		panic(err)
-	}
-	return matched_http || matched_https;
+func isValidProtocol(url string) (bool, error){ // Функция осуществляет проверку валидности протокола url
+	matchedHttp, err := regexp.MatchString(`"http://`, url)
+	matchedHttps, err := regexp.MatchString(`"https://`, url)
+	return matchedHttp || matchedHttps, err;
 }
 
-func too_many_double_slashes(url string) bool{ // This function check how much "//" contains the url
-	double_slashes_tmp := regexp.MustCompile(`//`)
-	if len(double_slashes_tmp.FindAllStringIndex(url, -1)) > 1{
+func tooManyDoubleSlashes(url string) bool{ // Функция осуществляет проверку на колличество двойных слешей
+	doubleSlashesTmp := regexp.MustCompile(`//`)
+	if len(doubleSlashesTmp.FindAllStringIndex(url, -1)) > 1{
 		return true
 	}
 	return false
 }
 
-func has_invalid_symbols(url string) bool{ // This function find invalid symbols in the url
-	matched_inv_symbols, err := regexp.MatchString(`[^A-Z|a-z|/|"|=|:|\.]`, url)
-	if err != nil{
-		panic(err)
+func hasInvalidSymbols(url string) (bool, error){ // Функция проверяет url на содержание невалидных символов
+	matchedInvSymbols, err := regexp.MatchString(`[^A-Z|a-z|/|"|=|:|\.]`, url)
+	if matchedInvSymbols{
+		return true, err
 	}
-	if matched_inv_symbols{
-		return true
-	}
-	return false
+	return false, err
 }
 
-func parse_line(line string, idx_line int, errs *[]Info){ // Here the string is parsed
-	href_url_template := regexp.MustCompile(`href="[^"]*"`)
-	src_url_template := regexp.MustCompile(`src="[^"]*"`)
-	idx_coloumn_href := href_url_template.FindAllStringIndex(line, -1)
-	idx_coloumn_src := src_url_template.FindAllStringIndex(line, -1)
-	href_urls := href_url_template.FindAllString(line, -1)
-	src_urls := src_url_template.FindAllString(line, -1)
-	urls := append(href_urls, src_urls...)
-	idx_urls := append(idx_coloumn_href, idx_coloumn_src...)
+func parseLine(line string, idx_line int, errs *[]Info){ // В этой функции происходит парсинг строки и создание ошибок
+	hrefUrlTemplate := regexp.MustCompile(`href="[^"]*"`)
+	srcUrlTemplate := regexp.MustCompile(`src="[^"]*"`)
+	idxColoumnHref := hrefUrlTemplate.FindAllStringIndex(line, -1)
+	idxColoumnSrc := srcUrlTemplate.FindAllStringIndex(line, -1)
+	hrefUrls := hrefUrlTemplate.FindAllString(line, -1)
+	srcUrls := srcUrlTemplate.FindAllString(line, -1)
+	urls := append(hrefUrls, srcUrls...)
+	idx_urls := append(idxColoumnHref, idxColoumnSrc...)
 	for idx, url := range urls{
-		if !is_valid_protocol(url){
+		if ans, err := isValidProtocol(url); !ans && err == nil{
 
 			*errs = append(*errs, Info{idx_line + 1, idx_urls[idx][0],
 				"Invalid protocol!"})
-		}else if too_many_double_slashes(url){
+		}else if tooManyDoubleSlashes(url){
 
 			*errs = append(*errs, Info{idx_line + 1, idx_urls[idx][0],
 				"Too many double slashes!"})
 
-		}else if has_invalid_symbols(url){
+		}else if ans, err := hasInvalidSymbols(url); ans && err == nil {
 			*errs = append(*errs, Info{idx_line + 1, idx_urls[idx][0],
 				"Invalid symbols!"})
 		}
+
 	}
 }
 
-func Html_check(filename string) (error, []Info){ // Main function that iterates strings in the gotten file
+func HtmlCheck(filename string) (error, []Info){ // Стартовая функция, открывает файл и читает из него построчно,
+	// запуская остальные обработки
 	file, err := os.OpenFile(filename, 'r', 0600)
 	if err != nil{
-		return err, []Info{}
+		return err, nil
 	}
 	reader := bufio.NewReader(file)
 	var errs []Info
 	idx := 0
 	for line, err := reader.ReadString('\n'); err != io.EOF; line, err = reader.ReadString('\n'){
-		if has_url(line){
-
-			parse_line(line, idx, &errs)
+		if ans, err := hasUrl(line); ans && err == nil{
+			parseLine(line, idx, &errs)
+		}else if err != nil{
+			return err, nil
 		}
 		idx ++
 	}
 	return nil, errs
 
 }
+//
+//func main()  {
+//	ans, err := HtmlCheck("test1.txt")
+//	fmt.Print(ans, err)
+//}
