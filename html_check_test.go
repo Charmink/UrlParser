@@ -1,16 +1,17 @@
 package main
 
 import (
-	"testing"
-	"project/html_check"
+	"UrlParser-1/html_check"
+	"fmt"
 	"reflect"
+	"testing"
 )
 
-func TestHtml_check(t *testing.T){
+func TestHtml_check(t *testing.T) {
 
-	TestTable := []struct{
+	TestTable := []struct {
 		filename string
-		result []html_check.Info
+		result   []html_check.Info
 	}{
 		{
 			"static/test1.txt",
@@ -26,8 +27,9 @@ func TestHtml_check(t *testing.T){
 			[]html_check.Info{{6, 8, "Invalid protocol!"}},
 		},
 	}
-	for _, test := range TestTable{
-		if _, res := html_check.HtmlCheck(test.filename); !reflect.DeepEqual(res, test.result){
+	for _, test := range TestTable {
+		if _, res := html_check.HtmlCheck(test.filename); !reflect.DeepEqual(res, test.result) {
+			fmt.Println(res, test.result)
 			t.Errorf("Expected: %v\nFound: %v", test.result, res)
 		}
 	}
