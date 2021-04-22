@@ -3,7 +3,6 @@ package html_check
 import (
 	"bufio"
 	"strings"
-
 	//"fmt"
 	"io"
 	"os"
@@ -28,7 +27,7 @@ func isValidProtocol(url string) (bool, error) { // Функция осущес�
 }
 
 func tooManyDoubleSlashes(url string) bool { // Функция осуществляет проверку на колличество двойных слешей
-	doubleSlashesTmp := regexp.MustCompile(`//`)
+	doubleSlashesTmp := regexp.MustCompile(`\/\/`)
 	if len(doubleSlashesTmp.FindAllStringIndex(url, -1)) > 1 {
 		return true
 	}
@@ -36,7 +35,7 @@ func tooManyDoubleSlashes(url string) bool { // Функция осуществ�
 }
 
 func hasInvalidSymbols(url string) (bool, error) { // Функция проверяет url на содержание невалидных символов
-	matchedInvSymbols, err := regexp.MatchString(`[^A-Z|a-z|/|:|\.]+`, url) //крайне костыльный парсинг, переделать!
+	matchedInvSymbols, err := regexp.MatchString(`[^A-Z|0-9|a-z|\/|:|\.]+`, url)
 	if matchedInvSymbols {
 		return true, err
 	}

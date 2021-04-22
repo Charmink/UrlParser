@@ -4,3 +4,4 @@
 <meta charset="UTF-8"> <!-- Определяем кодировку символов документа -->
 <link rel="stylesheet" type="text/css" href="style.css"> <!-- Подключаем внешнюю таблицу стилей -->
 <script src="script.js"></script> <!-- Подключаем сценарии -->
+<div><a href='https://serv/1'></div>
